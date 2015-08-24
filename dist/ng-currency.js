@@ -7,6 +7,16 @@
  */
 
 angular.module('ng-currency', [])
+    .directive('pageupCurrencyWrapper', function () {
+        return {
+            restrict: 'A',
+            template: '<div class="form-group"><div class="input-group"><div class="input-group-addon">{{symbol}}</div><input type="text" name="currency" class="form-control" pageup-display ng-currency currency-symbol="{{symbol}}" ng-model="value"></div></div>',
+            scope: {
+                value: "=",
+                symbol: "="
+            }
+        };
+    })
     .directive('ngCurrency', ['$filter', '$locale', function ($filter, $locale) {
         return {
             require: 'ngModel',
@@ -19,16 +29,18 @@ angular.module('ng-currency', [])
             },
             link: function (scope, element, attrs, ngModel) {
                 
-                if (attrs.ngCurrency === 'false') return;
+                if (attrs.ngCurrency === 'false') {
+                    return;
+                }
                 
                 var fract = (typeof scope.fraction !== 'undefined')?scope.fraction:2;
 
                 function decimalRex(dChar) {
-                    return RegExp("\\d|\\-|\\" + dChar, 'g');
+                    return new RegExp("\\d|\\-|\\" + dChar, 'g');
                 }
 
                 function clearRex(dChar) {
-                    return RegExp("\\-{0,1}((\\" + dChar + ")|([0-9]{1,}\\" + dChar + "?))&?[0-9]{0," + fract + "}", 'g');
+                    return new RegExp("\\-{0,1}((\\" + dChar + ")|([0-9]{1,}\\" + dChar + "?))&?[0-9]{0," + fract + "}", 'g');
                 }
 
                 function clearValue(value) {
@@ -42,7 +54,7 @@ angular.module('ng-currency', [])
                     var neg_str = neg_dummy.substring(0,neg_idx);
                     value = value.replace(neg_str, "-");
 
-                    if(RegExp("^-[\\s]*$", 'g').test(value)) {
+                    if(new RegExp("^-[\\s]*$", 'g').test(value)) {
                         value = "-0";
                     }
 
@@ -94,7 +106,14 @@ angular.module('ng-currency', [])
                 });
 
                 ngModel.$formatters.unshift(function (value) {
-                    return $filter('currency')(value, currencySymbol(), scope.fraction);
+                    if('pageupDisplay' in attrs) {
+                        var format = $filter('currency')(value, currencySymbol(), scope.fraction);
+                        format = format.replace(currencySymbol(), '');
+                        return format;
+                    }
+                    else {
+                        return $filter('currency')(value, currencySymbol(), scope.fraction);
+                    }
                 });
 
                 ngModel.$validators.min = function(cVal) {
