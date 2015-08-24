@@ -10,7 +10,7 @@ angular.module('ng-currency', [])
     .directive('pageupCurrencyWrapper', function () {
         return {
             restrict: 'A',
-            template: '<div class="form-group"><div class="input-group"><div class="input-group-addon">{{symbol}}</div><input type="text" name="currency" class="form-control" pageup-display ng-currency currency-symbol="{{symbol}}" ng-model="value"></div></div>',
+            template: '<div class="input-group"><div class="input-group-addon">{{symbol}}</div><input type="text" name="currency" class="form-control" pageup-display ng-currency currency-symbol="{{symbol}}" ng-model="value"></div>',
             scope: {
                 value: "=",
                 symbol: "="
