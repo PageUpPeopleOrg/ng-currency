@@ -94,7 +94,13 @@ angular.module('ng-currency', [])
                 });
 
                 ngModel.$formatters.unshift(function (value) {
-                    return $filter('currency')(value, currencySymbol(), scope.fraction);
+                    if('removeSymbol' in attrs) {
+                        var value = $filter('currency')(value, currencySymbol(), scope.fraction);
+                        return value.replace(currencySymbol(), '');
+                    }
+                    else {
+                        return $filter('currency')(value, currencySymbol(), scope.fraction);
+                    }
                 });
 
                 ngModel.$validators.min = function(cVal) {
